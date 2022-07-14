@@ -23,13 +23,13 @@ def greedy_optimizer(feature_dict, layer_idx, m_sharp, Z, tau_tilde):
     #print('tau_all: {}'.format(len(tau_tilde)))
     
     J = []
-    min_loss = 10**8
     m = original_size[layer_idx]
     cov_ff = cov_mx(feature_dict, layer_idx, m, m)
     '''print(torch.linalg.matrix_rank(cov_ff))
     sys.exit()'''
     while len(J) < m_sharp:
         new_neuron = None
+        min_loss = 10**8
         for n in range(original_size[layer_idx]):
             J.append(n)
             if len(J) != len(set(J)):
@@ -41,7 +41,9 @@ def greedy_optimizer(feature_dict, layer_idx, m_sharp, Z, tau_tilde):
                 new_neuron = n
             J.pop(-1)
         J.append(new_neuron)
-        print('J: {}'.format(J))
+        #print('J: {}'.format(J))
+        if len(J)%10==0:
+            print(len(J))
     return J
 
 def construct(J, tau_all, compressed_size, original_model, feature_dict, device):
@@ -178,6 +180,7 @@ def compress(original_model, feature_dict, device):
         # update parameter for previous layer.
         #J_sharp.append(greedy_optimizer(feature_dict, idx, compressed_size[idx], Z, tau[idx]))
         W = model.linear_relu_stack[layer_idx*2].weight
+        J_plus = J
     J_sharp.reverse()
     taus.reverse()
 

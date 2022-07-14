@@ -55,6 +55,8 @@ def cov_mx(feature_dict, layer, dim1, dim2):
         #partial_tensor = feature_dict[key][:, dim2]
         full_tensor = feature_dict[key]
         return torch.t(torch.matmul(torch.t(partial_tensor), full_tensor))/n
+    else:
+        return None
 
 def convex_loss(feature_dict, layer, J, Z, tau_all, cov_ff):
     theta = 0.3
