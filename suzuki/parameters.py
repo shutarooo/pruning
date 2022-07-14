@@ -77,10 +77,14 @@ def convex_loss(feature_dict, layer, J, Z, tau_all, cov_ff):
     tau = torch.tensor(tau).to(device)
 
     mx1 = cov_jj + torch.diag(tau).to(device)
-    if torch.linalg.det(mx1) == 0:
+    '''if torch.linalg.det(mx1) == 0:
         #print('singular.')
+        return 10**8'''
+    Ainv, info = torch.linalg.inv_ex(mx1)
+    if info==1:
+        print('singular')
         return 10**8
-    mx2 = cov_ff - cov_fj@torch.inverse(mx1)@cov_jf
+    mx2 = cov_ff - cov_fj@Ainv@cov_jf
     La = torch.trace(mx2)
     Lb = torch.trace( Z@mx2@torch.t(Z) )
 
