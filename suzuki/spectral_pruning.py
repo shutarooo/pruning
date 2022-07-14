@@ -36,6 +36,9 @@ def greedy_optimizer(feature_dict, layer_idx, m_sharp, Z, tau_tilde):
                 J.pop(-1)
                 continue
             loss = convex_loss(feature_dict, layer_idx, J, Z, tau_tilde, cov_ff)
+            if new_neuron==None:
+                min_loss = loss
+                new_neuron = n
             if loss < min_loss:
                 min_loss = loss
                 new_neuron = n
