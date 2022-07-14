@@ -14,9 +14,10 @@ import json
 
 from parameters import *
 
-
 from parameters import layer_num, original_size, layer_keys, n
 from model import *
+
+
 
 def greedy_optimizer(feature_dict, layer_idx, m_sharp, Z, tau_tilde):
     #print('tau_all: {}'.format(len(tau_tilde)))
@@ -73,7 +74,7 @@ def construct(J, tau_all, compressed_size, original_model, feature_dict, device)
             break
         weight_list.append(weight_original[J[i]] @ A_hat_minus)
         bias_list.append(bias_original[J[i]])
-    compressed_model = CompressedNeuralNetwork(weight_list, bias_list, compressed_size)
+    compressed_model = CompressedShallowNeuralNetwork(weight_list, bias_list, compressed_size)
     return compressed_model
 
 def est_hyper(feature_dict, layer_idx, device):
@@ -91,15 +92,14 @@ def est_hyper(feature_dict, layer_idx, device):
         return tau_tilde
 
     # hyper parameter initialization
-    lamb = 10**(-1) * torch.trace(cov_l) * 1
-    #c = [63, 48, 2210]
-    c = [152.69, 434.14, 6480]
-    lamb = c[layer_idx]
-    #m = [10, 10, 9]
+    lamb = 10**(-3) * torch.trace(cov_l) * 1
+    lamb = 11.71
+    #c = [152.69, 434.14, 6480]
+    #lamb = c[layer_idx]
     m_sharp = 100000
     n_hat = None
     # search lamb s.t. m_sharp < m
-    while m_sharp > 10:
+    while m_sharp > 500:
         
         n_hat = N_hat(layer_idx, lamb, device, feature_dict)
         
@@ -115,42 +115,6 @@ def est_hyper(feature_dict, layer_idx, device):
     tau_tilde = [mx[i][i] / n_hat for i in range(m)]
 
     return lamb, m_sharp, tau_tilde
-
-# old
-def est_hyperw(feature_dict, layer_idx, m, device):
-    print("------- {} layer --------".format(layer_idx))
-    #n = original_size[layer_idx]
-
-    #//////////////////////////////////////////////////////////////////////////////////////
-    
-    cov_l = cov_mx(feature_dict, layer_idx, m, m)
-    ide = torch.eye(original_size[layer_idx]).to(device)
-
-    #lamb = 10**(-6) * torch.trace(cov_mx(feature_dict, layer_keys[layer_idx], n, n))
-    lamb = 10**(-3) * torch.trace(cov_l)
-    tau = None
-    m_sharp = 100000
-
-    # 1st: fix lamb s.t. m_sharp < m
-    while m_sharp > m*0.7:
-        inv_mx = torch.inverse(cov_l + lamb * ide)
-        n_hat = N_hat(layer_idx, lamb, device, feature_dict)
-        print('N_nat: {}'.format(n_hat))
-        mx = cov_l @ inv_mx
-        tau = [mx[i][i] / n_hat for i in range(m)]
-        m_sharp = int(5*n_hat * math.log(80*n_hat)) + 1
-        print(m_sharp)
-        lamb *= 2
-    lamb /= 2
-    # 2nd: calculate m_sharp which satisfies the condition
-    '''lhs = 0
-    for tau_j in tau:
-        print(tau_j)
-        lhs += 1/tau_j
-    m_condition = int((3/5)*lhs/m) + 1
-
-    m_sharp = max(m_sharp, m_condition)'''
-    return tau, lamb, m_sharp
 
 def check_condition(m_sharps, tau_tildes, J_sharp):
     for layer_idx in range(layer_num):
@@ -189,7 +153,7 @@ def compress(original_model, feature_dict, device):
     print('@@@@@@@@@@ compressing the original model. @@@@@@@@@@@@')
     J_plus = [i for i in range(10)]
     model = original_model
-    W = model.linear_relu_stack[6].weight
+    W = model.linear_relu_stack[layer_num*2].weight
     for layer_idx in reversed(range(layer_num)):
         #lamb, m_sharp, tau_tilde_plus = est_hyper(feature_dict, layer_idx, device)
         lamb = lambdas[layer_idx]

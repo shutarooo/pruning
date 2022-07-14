@@ -11,15 +11,21 @@ from torchvision import datasets, transforms
 import math
 import sys
 
-layer_num = 3
+import inspect
+
+'''frame = inspect.stack()[1]
+filename = inspect.getmodule(frame[0]).__file__
+print(filename)'''
+
+'''layer_num = 3
 original_size = [300, 1000, 300, 10]
 layer_keys = ['layer_1', 'layer_2', 'layer_3', 'out']
-n = 60000
+n = 60000'''
 
-'''layer_num = 1
+layer_num = 1
 original_size = [1000, 10]
 layer_keys = ['layer_1', 'out']
-n = 60000'''
+n = 60000
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 

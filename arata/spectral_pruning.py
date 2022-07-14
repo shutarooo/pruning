@@ -23,11 +23,16 @@ original_size = [300, 1000, 300, 10]
 layer_keys = ['layer_1', 'layer_2', 'layer_3', 'out']
 n = 60000
 
+layer_num = 1
+original_size = [1000, 10]
+layer_keys = ['layer_1', 'out']
+n = 60000
+
 def EVD(feature_dict, layer_idx):
     layer = layer_keys[layer_idx]
     output = feature_dict[layer]
     cov_mx =  torch.t(output) @ output
-    print(torch.min(cov_mx))
+    #print(torch.min(cov_mx))
     e_values, e_vectors = torch.linalg.eig(cov_mx)
     e_vectors = output @ e_vectors.to(torch.float)
     '''for i in range(len(e_values)):
@@ -42,8 +47,8 @@ def EVD(feature_dict, layer_idx):
                 cnt += 1
         print('the number of positive elements in e_vector[{}] is {}'.format(i,cnt))
     '''
-    print(e_values[0])
-    print(e_vectors[:,0])
+    #print('e_values'e_values[:5])
+    #print(e_vectors[:,0])
     return e_values, e_vectors
 
 def construct(W_list, A_list, feature_dict, original_model, extract_loader, compressed_size):
@@ -88,7 +93,7 @@ def construct(W_list, A_list, feature_dict, original_model, extract_loader, comp
         weight_list.append(W @ P)
     bias_original = original_model.linear_relu_stack[layer_num*2].bias
     bias_list.append(bias_original)
-    compressed_model = CompressedNeuralNetwork(weight_list, bias_list, compressed_size)
+    compressed_model = CompressedShallowNeuralNetwork(weight_list, bias_list, compressed_size)
     return compressed_model
     
 
@@ -143,7 +148,7 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
         W_list.append(W)
         A_list.append(A)
 
-    d = {'W_list': W_list, 'A_list': A_list}
+    '''d = {'W_list': W_list, 'A_list': A_list}
     torch.save(d, 'data/WA.pt')
     #sys.exit()
     
@@ -151,7 +156,7 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
 
     WA = torch.load('data/WA.pt')
     W_list = WA['W_list']
-    A_list = WA['A_list']
+    A_list = WA['A_list']'''
     compressed_model = construct(W_list, A_list, feature_dict, original_model, extract_loader, compressed_size)
     return compressed_model
 

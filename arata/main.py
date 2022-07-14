@@ -74,18 +74,20 @@ def main(is_compress):
 # Test the saved model.
 def test(device): 
     compressed_size = []
+    weight_list = []
+    bias_list = []
     PATH = 'data/compressed_model.pth'
     tens = torch.load(PATH)
     for idx, key in enumerate(tens.keys()):
         if idx%2 == 1:
+            bias_list.append(tens[key])
             continue
+        weight_list.append(tens[key])
         compressed_size.append(tens[key].size()[0])
     compressed_size.pop(-1)
     print(compressed_size)
 
-    compressed_model = LoadNeuralNetwork(compressed_size).to(device)
-    PATH = 'data/compressed_model.pth'
-    compressed_model.load_state_dict(torch.load(PATH))
+    compressed_model = CompressedNeuralNetwork(weight_list, bias_list, compressed_size).to(device)
 
     train_dataloader, test_dataloader = dataloader(10000)
     loss_fn = nn.CrossEntropyLoss()
@@ -98,7 +100,7 @@ def test(device):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('--compress', action='store_true', help='compress from scratch?')
+    parser.add_argument('--compress', action='store_true', help='compress from scratch? True or False')
     args = parser.parse_args() 
     is_compress = args.compress
     main(is_compress)
