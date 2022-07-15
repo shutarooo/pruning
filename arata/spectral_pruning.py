@@ -117,9 +117,12 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
             if layer_idx == 0:
                 tmp = extract_loader.__iter__()
                 input, target = tmp.next()
-                input = torch.flatten(input, 1, -1)
+                input = torch.flatten(input, 1, -1).to(device)
             else:
                 input = feature_dict[layer_keys[layer_idx-1]]
+
+            #print(input.device)
+            #print(e_vector.device) 
             W_plus_info = torch.linalg.lstsq(input, torch.t(e_vector).to(device))
             W_plus = W_plus_info.solution
             W_minus = -1 * W_plus
