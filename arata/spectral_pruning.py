@@ -18,6 +18,8 @@ sys.path.append('../')
 
 from suzuki.model import *
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 layer_num = 3
 original_size = [300, 1000, 300, 10]
 layer_keys = ['layer_1', 'layer_2', 'layer_3', 'out']
@@ -118,7 +120,7 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
                 input = torch.flatten(input, 1, -1)
             else:
                 input = feature_dict[layer_keys[layer_idx-1]]
-            W_plus_info = torch.linalg.lstsq(input, torch.t(e_vector))
+            W_plus_info = torch.linalg.lstsq(input, torch.t(e_vector).to(device))
             W_plus = W_plus_info.solution
             W_minus = -1 * W_plus
 

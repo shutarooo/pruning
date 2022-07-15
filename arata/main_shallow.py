@@ -30,7 +30,7 @@ def main(is_compress):
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print('Using {} device'.format(device))
-    compressed_size = [500]
+    compressed_size = [10]
     print('is_comress: {}'.format(is_compress))
 
     if is_compress:

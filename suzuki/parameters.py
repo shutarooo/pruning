@@ -82,7 +82,7 @@ def convex_loss(feature_dict, layer, J, Z, tau_all, cov_ff):
         return 10**8'''
     Ainv, info = torch.linalg.inv_ex(mx1)
     if info==1:
-        print('singular')
+        #print('singular')
         return 10**8
     mx2 = cov_ff - cov_fj@Ainv@cov_jf
     La = torch.trace(mx2)
