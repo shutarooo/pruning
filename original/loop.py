@@ -23,7 +23,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, is_save=False):
         # 予測と損失の計算
         pred = model(X)
         loss = loss_fn(pred, y)
-        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+        #correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         
         # バックプロパゲーション
         optimizer.zero_grad()

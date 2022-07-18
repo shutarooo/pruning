@@ -17,6 +17,7 @@ sys.path.append('../')
 from original.loop import *
 from original.model import *
 from original.dataloader import *
+from suzuki.model import *
 
 import sys
 import argparse
@@ -30,7 +31,7 @@ def main(is_compress):
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print('Using {} device'.format(device))
-    compressed_size = [10]
+    compressed_size = [249]
     print('is_comress: {}'.format(is_compress))
 
     if is_compress:

@@ -104,7 +104,7 @@ def est_hyper(feature_dict, layer_idx, device):
     m_sharp = 100000
     n_hat = None
     # search lamb s.t. m_sharp < m
-    while m_sharp > 500:
+    while m_sharp > 200:
         
         n_hat = N_hat(layer_idx, lamb, device, feature_dict)
         
