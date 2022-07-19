@@ -235,6 +235,7 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
         print(torch.linalg.matrix_rank(X_t))
         for j in range(int((compressed_size[layer_idx]+1)/2)):
             #a = e_vectors[:,j] / torch.linalg.norm(e_vectors[:,j]) *10**2
+            A = e_vectors
             A_t = torch.t(e_vectors)
             print('A.size(): {}'.format(A_t.size()))
 
