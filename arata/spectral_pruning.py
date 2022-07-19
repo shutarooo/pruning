@@ -236,8 +236,6 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
         for j in range(int((compressed_size[layer_idx]+1)/2)):
             #a = e_vectors[:,j] / torch.linalg.norm(e_vectors[:,j]) *10**2
             A = e_vectors
-            A_t = torch.t(e_vectors)
-            print('A.size(): {}'.format(A_t.size()))
 
             '''W = opt_tanh(A_t[:500],torch.t(X_t))
             A = torch.t(A_t[:500])'''
@@ -245,7 +243,7 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
 
             loss = 0
             Sigma = torch.t(feature_dict['layer_1'])
-            Proj_A = A @ torch.linalg.inv(A_t@A) @ A_t
+            Proj_A = A @ torch.linalg.inv(torch.t(A)@A) @ torch.t(A)
             for sigma in Sigma:
                 loss += torch.norm(sigma - sigma @ Proj_A )
             print(loss)
