@@ -241,11 +241,10 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
             '''W = opt_tanh(A_t[:500],torch.t(X_t))
             A = torch.t(A_t[:500])'''
             #W = opt_tanh(A_t,torch.t(X_t))
-            A = torch.t(A_t)
 
             loss = 0
             Sigma = torch.t(feature_dict['layer_1'])
-            Proj_A = A @ torch.inverse(A_t@A) @ A_t
+            Proj_A = A @ torch.linalg.inv(A_t@A) @ A_t
             for sigma in Sigma:
                 loss += torch.norm(sigma - sigma @ Proj_A )
             print(loss)
