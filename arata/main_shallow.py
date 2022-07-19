@@ -41,6 +41,8 @@ def main(is_compress):
 
         extract_loader = extract_dataloader()
         feature_dict = shallow_feature_extractor(original_model, extract_loader, device)
+        '''print(feature_dict['layer_1'].size())
+        sys.exit()'''
         PATH = 'data/compressed_shallow_model.pth'
         compressed_model = compress(original_model, compressed_size, feature_dict, extract_loader)
         torch.save(compressed_model.state_dict(), PATH)

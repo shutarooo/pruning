@@ -56,7 +56,7 @@ def opt_tanh(A_t, X):
 
     learning_rate = 1e-3
     batch_size = 600
-    epochs = 10
+    epochs = 30
 
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)

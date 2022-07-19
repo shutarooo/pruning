@@ -75,8 +75,8 @@ class TanhNetwork(nn.Module):
         super(TanhNetwork, self).__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28*28, 200, bias=False),
-            nn.ReLU()
+            nn.Linear(28*28, 1000, bias=False),
+            nn.Tanhshrink()
         )
 
     def forward(self, x):

@@ -218,7 +218,7 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
         e_values, e_vectors = EVD(feature_dict, layer_idx)
         print('e_vector.len: {}'.format(e_vectors.size()[0]))
 
-        for i in range(200):
+        for i in range(1000):
             cnt=0
             #print(torch.max(e_vectors[:,i]))
             #print(torch.min(e_vectors[:,i]))
@@ -238,8 +238,18 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
             A_t = torch.t(e_vectors)
             print('A.size(): {}'.format(A_t.size()))
 
-            W = opt_tanh(A_t[:200],torch.t(X_t))
-            A = torch.t(A_t[:200])
+            '''W = opt_tanh(A_t[:500],torch.t(X_t))
+            A = torch.t(A_t[:500])'''
+            #W = opt_tanh(A_t,torch.t(X_t))
+            A = torch.t(A_t)
+
+            loss = 0
+            Sigma = torch.t(feature_dict['layer_1'])
+            Proj_A = A @ torch.inverse(A_t@A) @ A_t
+            for sigma in Sigma:
+                loss += torch.norm(sigma - sigma @ Proj_A )
+            print(loss)
+            sys.exit()
             break
             #sys.exit()
 
