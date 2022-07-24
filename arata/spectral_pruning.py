@@ -53,6 +53,10 @@ def EVD(feature_dict, layer_idx):
     '''
     #print('e_values'e_values[:5])
     #print(e_vectors[:,0])
+    for i in range(e_vectors.size()[1]):
+        e_vectors[:,i] = 100 * e_vectors[:,i]/torch.linalg.norm(e_vectors[:,i])
+    d = {'e_values': e_values, 'e_vectors': e_vectors}
+    torch.save(d, 'data/eigen.pt')
     return e_values, e_vectors
 
 '''def opt_tanh(a, X_t):
@@ -215,27 +219,42 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
         X_t = torch.flatten(X_t, 1, -1).to(device)
 
         # EV information
-        e_values, e_vectors = EVD(feature_dict, layer_idx)
-        print('e_vector.len: {}'.format(e_vectors.size()[0]))
+        #e_values, e_vectors = EVD(feature_dict, layer_idx)
+        eigen = torch.load('data/eigen.pt')
+        e_values = eigen['e_values']
+        e_vectors = eigen['e_vectors']
+        #print('e_vector.len: {}'.format(e_vectors.size()[0]))
+        #e_vectors_norm = []
 
-        for i in range(1000):
-            cnt=0
+        '''for i in range(e_vectors.size()[1]):
             #print(torch.max(e_vectors[:,i]))
             #print(torch.min(e_vectors[:,i]))
             #print(torch.inner(e_vectors[:,0], e_vectors[:,i]))
-            e_vectors[:,i] = e_vectors[:,i]/torch.linalg.norm(e_vectors[:,i])
+
+            #e_vectors[:,i] = e_vectors[:,i]/torch.linalg.norm(e_vectors[:,i])
+            e_vectors_norm.append(torch.linalg.norm(e_vectors[:,i]))'''
+        '''cnt = 0
+        for e in e_values:
+            print(e.real / 60000)
+            cnt +=1
+        print(cnt)
+        sys.exit()'''
+        
+        '''for i in range(e_values.size()[0]):
+            e_values[i] = e_values[i] / torch.linalg.norm(e_vectors[:,i])
+            print(e_values[i])
+        sys.exit()'''
             
-            for j in range(e_vectors.size()[0]):
-                c=1
                 
         #sys.exit()
 
         A = None
         W = None
-        print(torch.linalg.matrix_rank(X_t))
+        #print(torch.linalg.matrix_rank(X_t))
         for j in range(int((compressed_size[layer_idx]+1)/2)):
             #a = e_vectors[:,j] / torch.linalg.norm(e_vectors[:,j]) *10**2
-            A = e_vectors
+            A = e_vectors[:,:50]
+            print(A.size())
 
             '''W = opt_tanh(A_t[:500],torch.t(X_t))
             A = torch.t(A_t[:500])'''
@@ -244,9 +263,24 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
             loss = 0
             Sigma = torch.t(feature_dict['layer_1'])
             Proj_A = A @ torch.linalg.inv(torch.t(A)@A) @ torch.t(A)
-            for sigma in Sigma:
-                loss += torch.norm(sigma - sigma @ Proj_A )
-            print(loss)
+
+            d = {'Proj_A': Proj_A}
+            torch.save(d, 'data/proj_mx.pt')
+
+            W_2 = original_model.linear_relu_stack[2].weight
+            cnt = 0
+            for i in range(Sigma.size()[1]):
+                target = W_2 @ Sigma[i]
+                pred = W_2 @ Sigma[i] @ Proj_A
+                if target.argmax() == pred.argmax():
+                    cnt +=1
+            print('accuracy: {}'.format(cnt/Sigma.size()[1]))
+
+            '''print('output loss:  {}'.format(torch.norm(W_2 @ (Sigma - Sigma@Proj_A))))
+            print('output scale: {}'.format(torch.norm(W_2 @ Sigma)))'''
+            '''for sigma in Sigma:
+                loss += torch.norm(sigma - sigma @ Proj_A ) **2
+            print(loss)'''
             sys.exit()
             break
             #sys.exit()

@@ -83,3 +83,22 @@ class TanhNetwork(nn.Module):
         x = self.flatten(x)
         logits = self.linear_relu_stack(x)
         return logits
+
+class ImaginaryNeuralNetwork(nn.Module):
+    def __init__(self, weight, bias, compressed_size):
+        super(ImaginaryNeuralNetwork, self).__init__()
+        self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(28*28, compressed_size[0]),
+            nn.ReLU(),
+            nn.Linear(compressed_size[0], 10),
+            nn.ReLU()
+        )
+        for i in range(2):
+            self.linear_relu_stack[i*2].weight = nn.Parameter(weight[i])
+            self.linear_relu_stack[i*2].bias = nn.Parameter(bias[i])
+
+    def forward(self, x):
+        x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits

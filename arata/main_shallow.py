@@ -41,7 +41,9 @@ def main(is_compress):
 
         extract_loader = extract_dataloader()
         feature_dict = shallow_feature_extractor(original_model, extract_loader, device)
-        '''print(feature_dict['layer_1'].size())
+        '''print(original_model.linear_relu_stack[2].weight.size())
+        sys.exit()'''
+        '''print(torch.norm(feature_dict['layer_1']) ** 2)
         sys.exit()'''
         PATH = 'data/compressed_shallow_model.pth'
         compressed_model = compress(original_model, compressed_size, feature_dict, extract_loader)
