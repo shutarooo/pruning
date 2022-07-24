@@ -219,10 +219,10 @@ def compress(original_model, compressed_size, feature_dict, extract_loader):
         X_t = torch.flatten(X_t, 1, -1).to(device)
 
         # EV information
-        #e_values, e_vectors = EVD(feature_dict, layer_idx)
-        eigen = torch.load('data/eigen.pt')
+        e_values, e_vectors = EVD(feature_dict, layer_idx)
+        '''eigen = torch.load('data/eigen.pt')
         e_values = eigen['e_values']
-        e_vectors = eigen['e_vectors']
+        e_vectors = eigen['e_vectors']'''
         #print('e_vector.len: {}'.format(e_vectors.size()[0]))
         #e_vectors_norm = []
 
